@@ -16,11 +16,6 @@ struct record
 	char Lawyer[22];
 };
 
-/*struct Base
-{
-	record element;
-	Base* next;
-};*/
 
 struct elem {
 	elem* next;
@@ -126,7 +121,6 @@ for (j = 8 ; j >=0; j--) {
 		q[i].tail = (elem*)&q[i].head;
 
 	w = *head;
-	  //k = sizeof(record)  - j;
 	k = byte[j];
 	while (w != NULL) {
 		d = w->digit[k];
@@ -146,19 +140,33 @@ for (j = 8 ; j >=0; j--) {
 }
 }
 
-void Search()
+void Indexed_array(elem** head, elem** tail, record*arr)
 {
 
+	p.tail = p.head;
+	for (size_t i = 0; i < 4000; i++)
+	{
+		arr[i] = p.tail->str;
+		p.tail = p.tail->next;
+	}
+
 }
+
+
+	
 
 int main()
 {
 
-	
+	record* arr = new record[4000];
+	int key;
 	p.head = NULL;
 	p.tail = NULL;
 	add_spis();
 	Digital_sort(&p.head, &p.tail);
-	Open_base();
+	Indexed_array(&p.head, &p.tail, *&arr);
+	
+
+	//Open_base();
 	return 0;
 }
