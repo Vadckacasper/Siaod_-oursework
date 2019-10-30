@@ -152,7 +152,40 @@ void Indexed_array(elem** head, elem** tail, record*arr)
 
 }
 
+void Search_Binary(record* arr, int lef, int righ, int key)
+{
+	int midd = 0;
+	while(lef < righ)
+	{
+		midd = (lef + righ) / 2;
+		if (arr[midd].Amount < key)
+			lef = midd + 1;
+		else
+			righ = midd;
+	}
+	if (key == 10000 || key == 20000 || key == 30000 || key == 40000)
+		midd++;
+	if (arr[midd].Amount == key)
+	{
+		int i = 1;
+		while (arr[midd].Amount == key)
+		{
+			
+			cout << i << ") " << arr[midd].Depositor << "   "
+				<< arr[midd].Amount << "    "
+				<< arr[midd].Date << "    "
+				<< arr[midd].Lawyer
+				<< endl;
+			i++;
+			midd++;
+		}
+	}
+	else
+	{
+		cout << "Element's " << key << " not found!" << endl;
+	}
 
+}
 	
 
 int main()
@@ -165,7 +198,9 @@ int main()
 	add_spis();
 	Digital_sort(&p.head, &p.tail);
 	Indexed_array(&p.head, &p.tail, *&arr);
-	
+	cout << "Enter the item you want to find ";
+	cin >> key;
+	Search_Binary(*&arr, 0, 4000, key);
 
 	//Open_base();
 	return 0;
