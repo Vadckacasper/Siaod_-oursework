@@ -33,6 +33,12 @@ struct queue
 
 }p;
 
+struct Vertex {
+	int data;
+	Vertex* left, * right;
+	int Balance;
+};
+
 void add_base(elem* p, record temp)
 {
 
@@ -72,7 +78,7 @@ void Open_base()
 		if (temp == 1)
 		{
 			int n = 0;
-			while ((p.head != p.tail) & (n < 20))
+			while ((p.head != p.tail) & (n < 500))
 			{
 
 				cout << i + 1 << ")";
@@ -140,41 +146,45 @@ for (j = 8 ; j >=0; j--) {
 }
 }
 
-void Indexed_array(elem** head, elem** tail, record*arr)
+void Indexed_array(elem** head, elem** tail, record**& arr)
 {
-
+	int d;
 	p.tail = p.head;
 	for (size_t i = 0; i < 4000; i++)
 	{
-		arr[i] = p.tail->str;
+		arr[i] = &(p.tail->str);
 		p.tail = p.tail->next;
 	}
 
+
 }
 
-void Search_Binary(record* arr, int lef, int righ, int key)
+void Search_Binary(record**& arr, int lef, int righ)
 {
+	int key = 0;
 	int midd = 0;
+	cout << "Enter the item you want to find ";
+	cin >> key;
 	while(lef < righ)
 	{
 		midd = (lef + righ) / 2;
-		if (arr[midd].Amount < key)
+		if ((arr[midd]->Amount) < key)
 			lef = midd + 1;
 		else
 			righ = midd;
 	}
 	if (key == 10000 || key == 20000 || key == 30000 || key == 40000)
 		midd++;
-	if (arr[midd].Amount == key)
+	if (arr[midd]->Amount == key)
 	{
 		int i = 1;
-		while (arr[midd].Amount == key)
+		while (arr[midd]->Amount == key)
 		{
 			
-			cout << i << ") " << arr[midd].Depositor << "   "
-				<< arr[midd].Amount << "    "
-				<< arr[midd].Date << "    "
-				<< arr[midd].Lawyer
+			cout << i << ") " << arr[midd]->Depositor << "   "
+				<< arr[midd]->Amount << "    "
+				<< arr[midd]->Date << "    "
+				<< arr[midd]->Lawyer
 				<< endl;
 			i++;
 			midd++;
@@ -185,23 +195,23 @@ void Search_Binary(record* arr, int lef, int righ, int key)
 		cout << "Element's " << key << " not found!" << endl;
 	}
 
+
 }
 	
 
 int main()
 {
 
-	record* arr = new record[4000];
+	record** arr = new record*[4000];
 	int key;
 	p.head = NULL;
 	p.tail = NULL;
 	add_spis();
 	Digital_sort(&p.head, &p.tail);
-	Indexed_array(&p.head, &p.tail, *&arr);
-	cout << "Enter the item you want to find ";
-	cin >> key;
-	Search_Binary(*&arr, 0, 4000, key);
+	Indexed_array(&p.head, &p.tail, arr);
+	Open_base();
+	Search_Binary(arr, 0, 4000);
 
-	//Open_base();
+	
 	return 0;
 }
