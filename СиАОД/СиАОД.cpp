@@ -34,7 +34,7 @@ struct queue
 }p;
 
 struct Vertex {
-	int data;
+	record* data;
 	Vertex* left, * right;
 	int Balance;
 };
@@ -194,8 +194,107 @@ void Search_Binary(record**& arr, int lef, int righ)
 	{
 		cout << "Element's " << key << " not found!" << endl;
 	}
+}
 
+void print(Vertex* p)
+{
+	if (p)
+	{
+		print(p->left);
+		cout << p->data->Depositor << "   "
+			<< p->data->Amount << "   "
+			<< p->data->Date << "   "
+			<< p->data->Lawyer << endl;
+		//cout << p->data <<"  ";
+		print(p->right);
+	}
+}
 
+int size_tree(Vertex* vertex)
+{
+	if (vertex == nullptr)
+		return 0;
+	else
+	{
+		return 1 + size_tree(vertex->left) + size_tree(vertex->right);
+	}
+
+}
+
+int VR = 1, HR = 1;
+
+void D_B_D(record*& x, Vertex*& p)
+{
+	if (p == nullptr)
+	{
+		p = new Vertex;
+		
+		p->data = x;
+		p->left = p->right = nullptr;
+		p->Balance = 0;
+		VR = 1;
+	}
+	else if (p->data->Depositor > x->Depositor)
+	{
+		D_B_D(x, p->left);
+		if (VR == 1)
+		{
+			if (p->Balance == 0)
+			{
+				Vertex* q;
+				q = p->left;
+				p->left = q->right;
+				q->right = p;
+				p = q;
+				q->Balance = 1;
+				VR = 0;
+				HR = 1;
+
+			}
+			else
+			{
+				p->Balance = 0;
+				VR = 1;
+				HR = 0;
+			}
+		}
+		else
+			HR = 0;
+	}
+	else if (p->data->Depositor < x->Depositor) {
+		D_B_D(x, p->right);
+		if (VR == 1)
+		{
+			p->Balance = 1;
+			HR = 1;
+			VR = 0;
+		}
+		else if (HR == 1)
+			if (p->Balance == 1)
+			{
+				Vertex* q;
+				q = p->right;
+				p->Balance = 0;
+				q->Balance = 0;
+				p->right = q->left;
+				q->left = p;
+				p = q;
+				VR = 1;
+				HR = 0;
+			}
+			else
+				HR = 0;
+	}
+}
+
+void tree(record**&arr, Vertex*root)
+{
+for (size_t i = 0; i < 4000; i++)
+	{
+		D_B_D(arr[i], root);
+	}
+	print(root);
+	cout <<endl << size_tree(root);
 }
 	
 
@@ -203,15 +302,15 @@ int main()
 {
 
 	record** arr = new record*[4000];
-	int key;
+	Vertex* root = nullptr;
 	p.head = NULL;
 	p.tail = NULL;
 	add_spis();
 	Digital_sort(&p.head, &p.tail);
 	Indexed_array(&p.head, &p.tail, arr);
-	Open_base();
-	Search_Binary(arr, 0, 4000);
-
+	//Open_base();
+	//Search_Binary(arr, 0, 4000);
+	tree(arr, root);
 	
 	return 0;
 }
