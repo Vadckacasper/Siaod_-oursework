@@ -3,9 +3,11 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
 #include <string.h>
 #include <fstream>
-#include "locale.h"; 
+#include <algorithm>
+
 using namespace std;
 
 
@@ -65,6 +67,7 @@ void add_spis()
 		p.tail = p.tail->next;
 		p.tail->str = temp;
 	}
+	base.close();
 }
 
 void Open_base()
@@ -150,7 +153,6 @@ for (j = 8 ; j >=0; j--) {
 
 void Indexed_array(elem** head, elem** tail, record**& arr)
 {
-	int d;
 	p.tail = p.head;
 	for (size_t i = 0; i < 4000; i++)
 	{
@@ -175,7 +177,7 @@ void D_B_D(record*& x, Vertex*& p)
 		p->Balance = 0;
 		VR = 1;
 	}
-	else if (strcmp(p->data->Depositor, x->Depositor) > 0)
+	else if (strcmp(p->data->Depositor, x->Depositor) >= 0)
 	{
 		//cout << p->data->Depositor << " > " << x->Depositor << endl;
 		D_B_D(x, p->left);
@@ -278,7 +280,8 @@ void Search_tree(Vertex* root, string x)
 
 	if (root)
 	{
-		string str(root->data->Depositor, sizeof(char) * x.length());
+		string str(root->data->Depositor, (sizeof(char) * x.length()));
+		
 		//cout << str << endl;
 
 		if (x < str)
@@ -303,6 +306,7 @@ void Search_tree(Vertex* root, string x)
 		}
 	}
 }
+//:::::::::::::::::::::::::::::::::::Меню::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 int prompt_submenu_item()
 {
@@ -321,6 +325,7 @@ int prompt_submenu_item()
 int tree(Vertex* root)
 {
 	string temp;
+	string qwer;
 	while (1)
 	{
 		int varian = prompt_submenu_item();
@@ -343,8 +348,10 @@ int tree(Vertex* root)
 			break;
 		case 2:
 			system("cls");
-			cin >> temp;
-			Search_tree(root, temp);
+			getline(cin, temp, '1');
+			qwer = temp.substr(1, temp.length() + 1);
+			//cout <<endl<< qwer;
+			Search_tree(root, qwer);
 			break;
 
 		case 3:
@@ -386,16 +393,13 @@ void Search_Binary(record**& arr, int lef, int righ, Vertex* root)
 		int i = 1;
 		while (arr[midd]->Amount == key  )
 		{
-			
+			D_B_D(arr[midd], root);
 			cout << i << ") " << arr[midd]->Depositor << "   "
 				<< arr[midd]->Amount << "    "
 				<< arr[midd]->Date << "    "
 				<< arr[midd]->Lawyer
 				<< endl;
-
-			i++;
-			
-			D_B_D(arr[midd], root);
+			i++;			
 			midd++;
 			if (midd == 4000)
 			{
@@ -421,13 +425,163 @@ int prompt_menu_item()
 		<< "2. Display list\n"
 		<< "3. To create an indexed array\n"
 		<< "4. Binary search\n"
-		<< "5. Exit\n" << endl;
+		<< "5. Code\n"
+		<< "6.Exit" << endl;
 	cout << ">>> ";
 	cin >> variant;
 	return variant;
 }
 
+void sort(double** arr_prob, int size)
+{
+	double temp = 0;
+	for (int i = 0; i < size - 1; i++) {
+		for (int j = 0; j < size - i - 1; j++) {
+			if (arr_prob[j][1] < arr_prob[j + 1][1]) {
+				
+				temp = arr_prob[j][1];
+				arr_prob[j][1] = arr_prob[j + 1][1];
+				arr_prob[j + 1][1] = temp;
+				temp = arr_prob[j][0];
+				arr_prob[j][0] = arr_prob[j + 1][0];
+				arr_prob[j + 1][0] = temp;
+			}
+		}
+	}
+}
 
+int Probabilities(double** arr_prob)
+{
+	ifstream base("testBase3.dat", ios::binary);
+	char temp=0;
+	int in = 0;
+	base.read((char*)& temp, sizeof(char));
+	//cout << (int)temp+128<< " ";
+	arr_prob[(int)temp + 128][0] = ((double)temp)+128;
+	arr_prob[(int)temp + 128][1] +=1;
+	while (!base.eof())
+	{
+		base.read((char*)& temp, sizeof(char));
+		//cout << (int)temp + 128 <<" ";
+		arr_prob[(int)temp + 128][0] = ((double)temp)+128;
+		arr_prob[(int)temp + 128][1] +=1;
+		in++;
+	}
+	int it = 0;
+	for (int i = 0; i < 256; i++)
+	{
+		if (arr_prob[i][1] != 0)
+		{
+			arr_prob[i][1] = arr_prob[i][1] / in;
+			it++;
+		}
+		
+	}
+	//sort(arr_prob, 256);
+	std::sort(arr_prob, arr_prob + 256, [](auto a, auto b) {return a[1] > b[1];});
+	base.close();
+	return it;
+}
+ 
+int Med(double** arr_working, int L, int R)
+{
+	double Sl = 0.0, Sr = 0.0;
+	int midd = 0;
+	for (int i = L; i <= R - 1; i++)
+	{
+		Sl += arr_working[i][1];
+	}
+	Sr = arr_working[R][1];
+	midd = R;
+	while(Sl >= Sr)
+	{
+		midd--;
+		Sl -= arr_working[midd][1];
+		Sr += arr_working[midd][1];
+	}
+	return midd;
+}
+
+void Fano(double** arr_working, int L, int R, int k, bool** C, int* len)
+{
+	int midd = 0;
+	if (L < R)
+	{
+		k++;
+		midd = Med(arr_working, L, R);
+		for (int i = L; i < R; i++)
+		{
+			if (i <= midd)
+			{
+				C[i][k] = 0;
+				len[i]++;
+			}
+			else
+			{
+				C[i][k] = 1;
+				len[i]++;
+			}
+		}
+		Fano(arr_working, L, midd, 0, C, len);
+		Fano(arr_working, midd+1, R, 0, C, len);
+	}
+}
+
+void Fano_code()
+{
+	double** arr_prob = new double*[256];
+	double** arr_working;
+	bool** C;
+	int* len;
+	int size = 0;
+	for (int i = 0; i < 256; i++)
+	{
+		arr_prob[i] = new double[2];
+	}
+	for (int i = 0; i < 256; i++)
+	{
+		for (int j = 0; j < 2; j++)
+		{
+			arr_prob[i][j] = 0;
+		}
+	}
+	size = Probabilities(arr_prob);
+	arr_working = new double* [size];
+	C = new bool* [size];
+	len = new int[size];
+	for (int i = 0; i < size; i++)
+	{
+		arr_working[i] = new double[2];
+		C[i] = new bool[32];
+		arr_working[i][0] = arr_prob[i][0];
+		arr_working[i][1] = arr_prob[i][1];
+	}
+	delete[] arr_prob;
+	cout << endl;//Вывод вероятностей
+	double q = 0.0;
+	for (int i = 0; i < size; i++)
+	{
+		cout  << arr_working[i][0] << "\t";
+		cout  << arr_working[i][1] << endl;
+		q += arr_working[i][1];
+
+	}
+	Fano(arr_working, 0, size-1, 0, C, len);
+	for (int i = 0; i < size; i++)
+	{
+		cout << len[i] << "\t";
+		for (int j = 0; j < 32; j++)
+		{
+			cout << C[i][j] ;
+			
+		}
+		cout << endl;
+
+	}
+	delete[] len;
+	delete[] C;
+	delete[] arr_working;
+}
 
 int main()
 {
@@ -437,8 +591,8 @@ int main()
 	p.head = NULL;
 	p.tail = NULL;
 	add_spis();
-
-	while (1)
+	Fano_code();
+	/*while (1)
 	{
 		
 		int variant = prompt_menu_item();
@@ -458,12 +612,15 @@ int main()
 			break;
 		
 		case 5:
+			
+			break;
+		case 6:
 			exit(EXIT_SUCCESS);
 			break;
 		default:
 			cout << "You chose the wrong option" << endl;
 			exit(EXIT_FAILURE);
 		}
-	}
+	}*/
 	return 0;
 }
